@@ -2,7 +2,6 @@ package mr.curk.piface;
 
 import com.pi4j.device.piface.PiFace;
 import com.pi4j.device.piface.impl.PiFaceDevice;
-import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
@@ -32,8 +31,9 @@ public class PiFaceModul implements Runnable {
 
         startPi();
 
-        if ( piCommand != PiCommand.WAITING){
+
         while (runningCondition) {
+            if ( piCommand != PiCommand.WAITING){
             switch (piCommand) {
                 case OUTPUT_0_OFF:
                     setOutputOff(0);

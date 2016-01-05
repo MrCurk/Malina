@@ -20,7 +20,7 @@ public class PiConsole implements  Runnable {
 
         System.out.println("Pi Console started!");
 
-        while (!(piCommand == piCommand.EXIT)){
+        while (piCommand != piCommand.EXIT){
             consoleInputString = scanner.nextLine();
             piCommand = PiCommand.setPiCommand(consoleInputString);
             piFaceModul.setCommand(piCommand);

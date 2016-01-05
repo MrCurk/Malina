@@ -13,13 +13,14 @@ public class Main {
         PiConsole piConsole;
 
 
-        piConsole = new PiConsole(piFaceModul);
+
 
         try {
             piFaceModul = new PiFaceModul();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        piConsole = new PiConsole(piFaceModul);
 
         new Thread(piFaceModul).start();
         new Thread(piConsole).start();
