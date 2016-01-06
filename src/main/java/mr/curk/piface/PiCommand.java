@@ -12,7 +12,7 @@ public enum PiCommand {
     OUTPUT_5_ON, OUTPUT_5_OFF,
     OUTPUT_6_ON, OUTPUT_6_OFF,
     OUTPUT_7_ON, OUTPUT_7_OFF,
-    HELP, STOP, START, RESTART, EXIT, STATUS, WAITING;
+    HELP, RESET, EXIT, STATUS;
 
     public  static  PiCommand setPiCommand(String commandString){
         String commandStringUpper = commandString.toUpperCase();
@@ -52,12 +52,8 @@ public enum PiCommand {
             case "STATUS":
             case "S":
                 return  STATUS;
-            case "STOP":
-                return STOP;
-            case  "START":
-                return START;
-            case "RESTART":
-                return RESTART;
+            case "RESET":
+                return RESET;
             case "Q":
             case "QUIT":
             case "EXIT":
@@ -72,9 +68,7 @@ public enum PiCommand {
         System.out.println("op[0-7] on - turn output n on.");
         System.out.println("op[0-7] off - turn output n off.");
         System.out.println("status or s -  display status of inputs and outputs ");
-        System.out.println("start -  start PiFaceModul ");
-        System.out.println("stop -  stop PiFaceModul ");
-        System.out.println("restart -  restart PiFaceModul ");
+        System.out.println("reset -  reset PiFaceModul ");
         System.out.println("exit or quit or q - exit");
     }
 }

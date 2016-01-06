@@ -14,8 +14,8 @@ import static com.pi4j.wiringpi.Spi.CHANNEL_0;
  */
 public class PiFaceModul implements Runnable {
     final private PiFace piFace;
-    private  PiCommand piCommand;
-    private  boolean runningCondition;
+
+    private boolean runningCondition;
 
     public PiFaceModul() throws IOException {
 
@@ -23,93 +23,108 @@ public class PiFaceModul implements Runnable {
         for (int i = 0; i < 8; i++) {
             piFace.getInputPin(i).setName("Input " + i);
         }
+
+        setListeners();
+        resetPi();
     }
 
     //RUNNABLE
     @Override
     public void run() {
 
-        startPi();
-
+        resetPi();
 
         while (runningCondition) {
-            if ( piCommand != PiCommand.WAITING){
-            switch (piCommand) {
-                case OUTPUT_0_OFF:
-                    setOutputOff(0);
-                    break;
-                case OUTPUT_0_ON:
-                    setOutputOn(0);
-                    break;
-                case OUTPUT_1_OFF:
-                    setOutputOff(1);
-                    break;
-                case OUTPUT_1_ON:
-                    setOutputOn(1);
-                    break;
-                case OUTPUT_2_OFF:
-                    setOutputOff(2);
-                    break;
-                case OUTPUT_2_ON:
-                    setOutputOn(2);
-                    break;
-                case OUTPUT_3_OFF:
-                    setOutputOff(3);
-                    break;
-                case OUTPUT_3_ON:
-                    setOutputOn(3);
-                    break;
-                case OUTPUT_4_OFF:
-                    setOutputOff(4);
-                    break;
-                case OUTPUT_4_ON:
-                    setOutputOn(4);
-                    break;
-                case OUTPUT_5_OFF:
-                    setOutputOff(5);
-                    break;
-                case OUTPUT_5_ON:
-                    setOutputOn(5);
-                    break;
-                case OUTPUT_6_OFF:
-                    setOutputOff(6);
-                    break;
-                case OUTPUT_6_ON:
-                    setOutputOn(6);
-                    break;
-                case OUTPUT_7_OFF:
-                    setOutputOff(7);
-                    break;
-                case OUTPUT_7_ON:
-                    setOutputOn(7);
-                    break;
-                case STOP:
-                    stopPi();
-                    break;
-                case START:
-                    startPi();
-                    break;
-                case STATUS:
-                    getStatusAll();
-                    break;
-                case EXIT:
-                    stopPi();
-                    System.exit(1);
-                    break;
-                case HELP:
-                default:
-                    PiCommand.printHelp();
-                    break;
-            }
-            piCommand=PiCommand.WAITING;
-        }
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    //SET COMMAND FOR PIFACE MODUL
+    public void setCommand(PiCommand piCommand) {
+
+        switch (piCommand) {
+            case OUTPUT_0_OFF:
+                setOutputOff(0);
+                break;
+            case OUTPUT_0_ON:
+                setOutputOn(0);
+                break;
+            case OUTPUT_1_OFF:
+                setOutputOff(1);
+                break;
+            case OUTPUT_1_ON:
+                setOutputOn(1);
+                break;
+            case OUTPUT_2_OFF:
+                setOutputOff(2);
+                break;
+            case OUTPUT_2_ON:
+                setOutputOn(2);
+                break;
+            case OUTPUT_3_OFF:
+                setOutputOff(3);
+                break;
+            case OUTPUT_3_ON:
+                setOutputOn(3);
+                break;
+            case OUTPUT_4_OFF:
+                setOutputOff(4);
+                break;
+            case OUTPUT_4_ON:
+                setOutputOn(4);
+                break;
+            case OUTPUT_5_OFF:
+                setOutputOff(5);
+                break;
+            case OUTPUT_5_ON:
+                setOutputOn(5);
+                break;
+            case OUTPUT_6_OFF:
+                setOutputOff(6);
+                break;
+            case OUTPUT_6_ON:
+                setOutputOn(6);
+                break;
+            case OUTPUT_7_OFF:
+                setOutputOff(7);
+                break;
+            case OUTPUT_7_ON:
+                setOutputOn(7);
+                break;
+            case RESET:
+                resetPi();
+                break;
+            case STATUS:
+                getStatusAll();
+                break;
+            case EXIT:
+                stopPi();
+                System.exit(1);
+                break;
+            case HELP:
+            default:
+                PiCommand.printHelp();
+                break;
+        }
+    }
+
+    //START PI FACE
+    private void resetPi() {
+        runningCondition = true;
+        setOutputAllOff();
+        System.out.println("PiFaceModul reseted!");
+    }
+
+    //STOP PI FACE
+    private void stopPi() {
+        runningCondition = false;
+        setOutputAllOff();
+        System.out.println("PiFaceModul stopped!");
     }
 
     private void getStatusAll() {
@@ -135,32 +150,6 @@ public class PiFaceModul implements Runnable {
         }
     }
 
-    //START PI FACE
-    private void startPi(){
-        if (!runningCondition) {
-            runningCondition = true;
-            piCommand = PiCommand.HELP;
-            setListeners();
-            setOutputAllOff();
-            System.out.println("PiFaceModul started!");
-        }else {
-            System.out.println("PiFaceModul allready running!");
-        }
-    }
-
-    //STOP PI FACE
-    private void stopPi(){
-        if (runningCondition) {
-            runningCondition = false;
-            piCommand = PiCommand.HELP;
-            //setListeners();
-            setOutputAllOff();
-            System.out.println("PiFaceModul stopped!");
-        }else {
-            System.out.println("PiFaceModul allready stopped!");
-        }
-    }
-
     //SET ALL OUTPUT OFF
     private void setOutputAllOff() {
         for (int i = 0; i < 8; i++) {
@@ -178,12 +167,6 @@ public class PiFaceModul implements Runnable {
         piFace.getOutputPin(pin).high();
     }
 
-
-    //SET COMMAND FOR PIFACE MODUL
-    public void setCommand(PiCommand piCommand) {
-        this.piCommand=piCommand;
-    }
-
     //SET LISTENER FOR ALL 8 INPUTS
     private void setListeners() {
         //INPUT 0 Listener
@@ -197,9 +180,9 @@ public class PiFaceModul implements Runnable {
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 0 on");
-                    System.out.println( "get pin"+gpioPinDigitalStateChangeEvent.getPin());
-                    System.out.println("get pin get name"+gpioPinDigitalStateChangeEvent.getPin().getName());
-                    System.out.println("get pin get pin"+gpioPinDigitalStateChangeEvent.getPin().getPin());
+                    System.out.println("get pin" + gpioPinDigitalStateChangeEvent.getPin());
+                    System.out.println("get pin get name" + gpioPinDigitalStateChangeEvent.getPin().getName());
+                    System.out.println("get pin get pin" + gpioPinDigitalStateChangeEvent.getPin().getPin());
                     System.out.println("get state VAlue" + gpioPinDigitalStateChangeEvent.getState().getValue());
                 }
             }

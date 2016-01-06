@@ -8,21 +8,15 @@ import java.io.IOException;
  */
 public class Main {
 
-    public static void main(String[] args) {
-        PiFaceModul piFaceModul = null;
+    public static void main(String[] args) throws IOException {
+        PiFaceModul piFaceModul;
         PiConsole piConsole;
 
 
-
-
-        try {
-            piFaceModul = new PiFaceModul();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        piFaceModul = new PiFaceModul();
         piConsole = new PiConsole(piFaceModul);
 
-        new Thread(piFaceModul).start();
+        //new Thread(piFaceModul).start();
         new Thread(piConsole).start();
         System.out.println("Malina started!");
 
