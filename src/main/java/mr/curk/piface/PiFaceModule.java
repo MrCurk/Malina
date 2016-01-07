@@ -10,41 +10,21 @@ import java.io.IOException;
 import static com.pi4j.wiringpi.Spi.CHANNEL_0;
 
 /**
- * Created by one on 29.12.2015.
+ * Created by Mr.Curk@gmail.com on 29.12.2015.
  */
-public class PiFaceModul implements Runnable {
+public class PiFaceModule {
     final private PiFace piFace;
+    private  HouseSecurityLogic houseSecurityLogic;
 
-    private boolean runningCondition;
-
-    public PiFaceModul() throws IOException {
-
+    public PiFaceModule() throws IOException {
         piFace = new PiFaceDevice(PiFace.DEFAULT_ADDRESS, CHANNEL_0);
-        for (int i = 0; i < 8; i++) {
-            piFace.getInputPin(i).setName("Input " + i);
-        }
-
-        setListeners();
-        resetPi();
+        setAllOutputOff();
+        setAllListeners();
+        setCommand(PiCommand.HELP);
+        houseSecurityLogic = new HouseSecurityLogic(this);
     }
 
-    //RUNNABLE
-    @Override
-    public void run() {
-
-        resetPi();
-
-        while (runningCondition) {
-
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    //SET COMMAND FOR PIFACE MODUL
+    //SET COMMAND FOR PIFACE MODULE
     public void setCommand(PiCommand piCommand) {
 
         switch (piCommand) {
@@ -97,14 +77,17 @@ public class PiFaceModul implements Runnable {
                 setOutputOn(7);
                 break;
             case RESET:
-                resetPi();
+                removeAllListeners();
+                setAllOutputOff();
+                setAllListeners();
                 break;
             case STATUS:
                 getStatusAll();
                 break;
             case EXIT:
-                stopPi();
-                System.exit(1);
+                removeAllListeners();
+                setAllOutputOff();
+                //System.exit(1);
                 break;
             case HELP:
             default:
@@ -113,20 +96,7 @@ public class PiFaceModul implements Runnable {
         }
     }
 
-    //START PI FACE
-    private void resetPi() {
-        runningCondition = true;
-        setOutputAllOff();
-        System.out.println("PiFaceModul reseted!");
-    }
-
-    //STOP PI FACE
-    private void stopPi() {
-        runningCondition = false;
-        setOutputAllOff();
-        System.out.println("PiFaceModul stopped!");
-    }
-
+    //PRINT ALL INPUT & OUTPUT STATUS
     private void getStatusAll() {
         for (int i = 0; i < 8; i++) {
             System.out.println("input " + i + " : " + getStatusInput(i)
@@ -134,6 +104,7 @@ public class PiFaceModul implements Runnable {
         }
     }
 
+    //GET SPECIFIC INPUT STATUS
     private String getStatusInput(int i) {
         if (piFace.getInputPin(i).isLow()) {
             return "On";
@@ -142,6 +113,7 @@ public class PiFaceModul implements Runnable {
         }
     }
 
+    //GET SPECIFIC OUTPUT STATUS
     private String getStatusOutput(int i) {
         if (piFace.getOutputPin(i).isHigh()) {
             return "On";
@@ -151,7 +123,7 @@ public class PiFaceModul implements Runnable {
     }
 
     //SET ALL OUTPUT OFF
-    private void setOutputAllOff() {
+    private void setAllOutputOff() {
         for (int i = 0; i < 8; i++) {
             setOutputOff(i);
         }
@@ -167,8 +139,20 @@ public class PiFaceModul implements Runnable {
         piFace.getOutputPin(pin).high();
     }
 
+    //REMOVE LISTENERS FOR ALL INPUTS
+    private void removeAllListeners() {
+        for (int i = 0; i < 8; i++) {
+            removeListener(i);
+        }
+    }
+
+    //REMOVE LISTENER FOR SPECIFIC INPUT
+    private void removeListener(int pin) {
+        piFace.getInputPin(pin).removeAllListeners();
+    }
+
     //SET LISTENER FOR ALL 8 INPUTS
-    private void setListeners() {
+    private void setAllListeners() {
         //INPUT 0 Listener
         piFace.getInputPin(0).addListener(new GpioPinListenerDigital() {
             @Override
@@ -176,14 +160,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 0 off");
+                    houseSecurityLogic.setInput(0,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 0 on");
-                    System.out.println("get pin" + gpioPinDigitalStateChangeEvent.getPin());
-                    System.out.println("get pin get name" + gpioPinDigitalStateChangeEvent.getPin().getName());
-                    System.out.println("get pin get pin" + gpioPinDigitalStateChangeEvent.getPin().getPin());
-                    System.out.println("get state VAlue" + gpioPinDigitalStateChangeEvent.getState().getValue());
+                    houseSecurityLogic.setInput(0,State.ON);
                 }
             }
         });
@@ -194,10 +176,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 1 off");
+                    houseSecurityLogic.setInput(1,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 1 on");
+                    houseSecurityLogic.setInput(1,State.ON);
                 }
             }
         });
@@ -208,10 +192,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 2 off");
+                    houseSecurityLogic.setInput(2,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 2 on");
+                    houseSecurityLogic.setInput(2,State.ON);
                 }
             }
         });
@@ -222,10 +208,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 3 off");
+                    houseSecurityLogic.setInput(3,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 3 on");
+                    houseSecurityLogic.setInput(3,State.ON);
                 }
             }
         });
@@ -236,10 +224,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 4 off");
+                    houseSecurityLogic.setInput(4,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 4 on");
+                    houseSecurityLogic.setInput(4,State.ON);
                 }
             }
         });
@@ -250,10 +240,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 5 off");
+                    houseSecurityLogic.setInput(5,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 5 on");
+                    houseSecurityLogic.setInput(5,State.ON);
                 }
             }
         });
@@ -264,10 +256,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 6 off");
+                    houseSecurityLogic.setInput(6,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 6 on");
+                    houseSecurityLogic.setInput(6,State.ON);
                 }
             }
         });
@@ -278,10 +272,12 @@ public class PiFaceModul implements Runnable {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
                     System.out.println("Input 7 off");
+                    houseSecurityLogic.setInput(7,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
                     System.out.println("Input 7 on");
+                    houseSecurityLogic.setInput(7,State.ON);
                 }
             }
         });

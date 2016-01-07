@@ -1,7 +1,7 @@
 package mr.curk.piface;
 
 /**
- * Created by mitja on 5.1.2016.
+ * Created by Mr.Curk@gmail.com on 5.1.2016.
  */
 public enum PiCommand {
     OUTPUT_0_ON, OUTPUT_0_OFF,
@@ -12,11 +12,11 @@ public enum PiCommand {
     OUTPUT_5_ON, OUTPUT_5_OFF,
     OUTPUT_6_ON, OUTPUT_6_OFF,
     OUTPUT_7_ON, OUTPUT_7_OFF,
-    HELP, RESET, EXIT, STATUS;
+    HELP, RESET, EXIT, STATUS
+    ;
 
     public  static  PiCommand setPiCommand(String commandString){
-        String commandStringUpper = commandString.toUpperCase();
-        switch (commandStringUpper){
+        switch (commandString.toUpperCase()){
             case "OP0 ON":
                 return  OUTPUT_0_ON;
             case "OP0 OFF":

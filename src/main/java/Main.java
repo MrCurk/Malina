@@ -1,22 +1,19 @@
-import mr.curk.piface.PiConsole;
-import mr.curk.piface.PiFaceModul;
-
+import mr.curk.piface.*;
 import java.io.IOException;
 
 /**
- * Created by one on 29.12.2015.
+ * Created by Mr.Curk@gmail.com on 29.12.2015.
  */
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        PiFaceModul piFaceModul;
+        PiFaceModule piFaceModule;
         PiConsole piConsole;
 
 
-        piFaceModul = new PiFaceModul();
-        piConsole = new PiConsole(piFaceModul);
+        piFaceModule = new PiFaceModule();
+        piConsole = new PiConsole(piFaceModule);
 
-        //new Thread(piFaceModul).start();
         new Thread(piConsole).start();
         System.out.println("Malina started!");
 
