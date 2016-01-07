@@ -11,7 +11,7 @@ public class HouseSecurityLogic  implements PiLogicInterface{
     }
     @Override
     public void setInput(int pin, State state) {
-        if (pin == 0 && state == State.ON){
+        if (pin == 0 && state == State.ON && piFaceModule.getStatusInput(3) == State.ON){
             piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
             piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
             piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);

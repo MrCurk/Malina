@@ -87,7 +87,7 @@ public class PiFaceModule {
             case EXIT:
                 removeAllListeners();
                 setAllOutputOff();
-                //System.exit(1);
+                System.exit(1);
                 break;
             case HELP:
             default:
@@ -105,20 +105,20 @@ public class PiFaceModule {
     }
 
     //GET SPECIFIC INPUT STATUS
-    private String getStatusInput(int i) {
+    public State getStatusInput(int i) {
         if (piFace.getInputPin(i).isLow()) {
-            return "On";
+            return State.ON;
         } else {
-            return "Off";
+            return State.OFF;
         }
     }
 
     //GET SPECIFIC OUTPUT STATUS
-    private String getStatusOutput(int i) {
+    public State getStatusOutput(int i) {
         if (piFace.getOutputPin(i).isHigh()) {
-            return "On";
+            return State.ON;
         } else {
-            return "Off";
+            return State.OFF;
         }
     }
 
