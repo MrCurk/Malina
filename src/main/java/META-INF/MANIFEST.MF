@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: pi4j-gpio-extension-1.0.jar pi4j-core-1.0.jar pi4j-device-
+ 1.0.jar
+Main-Class: Main
+
