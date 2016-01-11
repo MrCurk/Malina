@@ -1,10 +1,14 @@
 package mr.curk.piface;
 
+import mr.curk.mail.SendMail;
+
 /**
  * Created by Mr.Curk@gmail.com on 7.1.2016.
  */
 public class HouseSecurityLogic implements PiLogicInterface {
     private PiFaceModule piFaceModule;
+    private boolean alarm = false;
+
     private State input_0;
     private State input_1;
     private State input_2;
@@ -69,19 +73,19 @@ public class HouseSecurityLogic implements PiLogicInterface {
         logic();
     }
 
+
     private void logic() {
         if (input_0 == State.ON && input_3 == State.ON && !input_0_running) {
             input_0_running = true;
-            piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
-            piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
-            piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);
-            piFaceModule.setCommand(PiCommand.OUTPUT_4_ON);
 
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            new CountDown(20, 2);
+
+            if (piFaceModule.getStatusInput(0) == State.ON){
+
             }
+            SendMail.send("sensor 0", "sensor 0 at ");
+
+
             piFaceModule.setCommand(PiCommand.OUTPUT_5_ON);
             piFaceModule.setCommand(PiCommand.OUTPUT_6_ON);
             piFaceModule.setCommand(PiCommand.OUTPUT_7_ON);

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Class-Path: pi4j-gpio-extension-1.0.jar pi4j-core-1.0.jar pi4j-device-
- 1.0.jar
+ 1.0.jar mail-1.4.7.jar activation-1.1.jar
 Main-Class: Main
 
