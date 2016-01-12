@@ -12,17 +12,25 @@ import java.util.Date;
 import java.util.Properties;
 
 
-public class SendMail extends Object{
+public class SendMail implements Runnable {
+    private ConfigFile mailConfig;
+    private String subject;
+    private String message;
 
-    public static void send(String subject, String message)
-    {
+    public SendMail(ConfigFile mailConfig, String subject, String message) {
+        this.mailConfig = mailConfig;
+        this.subject = subject;
+        this.message = message;
+    }
 
-        try{
+    @Override
+    public void run() {
+        try {
 
             Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.mail.yahoo.com"); // for gmail use smtp.gmail.com
+            props.put("mail.smtp.host", mailConfig.getMailSmtpHost()); // for gmail use smtp.gmail.com or "smtp.mail.yahoo.com"
             props.put("mail.smtp.auth", "true");
-            //props.put("mail.debug", "true");
+            props.put("mail.debug", mailConfig.getMailDebug());
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.port", "465");
             props.put("mail.smtp.socketFactory.port", "465");
@@ -32,31 +40,31 @@ public class SendMail extends Object{
             Session mailSession = Session.getInstance(props, new javax.mail.Authenticator() {
 
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("@yahoo.com", "");
+                    return new PasswordAuthentication(mailConfig.getUsername(), mailConfig.getPassword());
 
                 }
             });
 
-            //mailSession.setDebug(true); // Enable the debug mode
+            mailSession.setDebug(mailConfig.getMailDebugBoolean()); // Enable the debug mode
 
-            Message msg = new MimeMessage( mailSession );
+            Message msg = new MimeMessage(mailSession);
 
             //--[ Set the FROM, TO, DATE and SUBJECT fields
-            msg.setFrom( new InternetAddress( "@yahoo.com" ) );
-            msg.setRecipients( Message.RecipientType.TO,InternetAddress.parse("@yahoo.com") );
-            msg.setSentDate( new Date());
-            msg.setSubject( subject );
+            msg.setFrom(new InternetAddress(mailConfig.getMailFrom()));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mailConfig.getMailTo()));
+            msg.setSentDate(new Date());
+            msg.setSubject(subject);
 
             //--[ Create the body of the mail
-            msg.setText( message + new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(Calendar.getInstance().getTime()) );
+            msg.setText(new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(Calendar.getInstance().getTime()) + message);
 
             //--[ Ask the Transport class to send our mail message
-            Transport.send( msg );
+            Transport.send(msg);
 
-        }catch(Exception E){
-            System.out.println( "Oops something has gone pearshaped!");
-            System.out.println( E );
+        } catch (Exception E) {
+            System.out.println("SendMail Error!");
+            System.out.println(E.toString());
         }
-        System.out.println("Mail sended!");
+        System.out.println("Mail sent!");
     }
 }

@@ -1,15 +1,12 @@
 package mr.curk.piface;
 
-/**
- * Created by one on 11.1.2016.
- */
 public class CountDown {
-    private int secondsWait;
+
     private int secondsInterval;
     private int loopRepeat;
 
     public CountDown(int secondsWait, int secondsInterval) {
-        this.secondsWait = secondsWait;
+
         this.secondsInterval = secondsInterval;
         if (secondsInterval > 0) {
             loopRepeat = secondsWait / secondsInterval;

@@ -2,9 +2,6 @@ package mr.curk.piface;
 
 import java.util.Scanner;
 
-/**
- * Created by Mr.Curk@gmail.com on 5.1.2016.
- */
 public class PiConsole implements  Runnable {
     private  PiFaceModule piFaceModule;
 
@@ -19,7 +16,7 @@ public class PiConsole implements  Runnable {
 
         System.out.println("Pi Console started!");
 
-        while (piCommand != piCommand.EXIT){
+        while (piCommand != PiCommand.EXIT){
             piCommand = PiCommand.setPiCommand(scanner.nextLine());
             piFaceModule.setCommand(piCommand);
         }

@@ -16,6 +16,7 @@
         <element id="library" level="project" name="Maven: javax.mail:mail:1.4.7" />
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/src/main/runMe.sh" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/mail.config" />
     </root>
   </artifact>
 </component>

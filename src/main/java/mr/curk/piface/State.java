@@ -1,8 +1,5 @@
 package mr.curk.piface;
 
-/**
- * Created by Mr.Curk@gmail.com on 7.1.2016.
- */
 public enum State {
     ON, OFF;
     public  static  State setState(String stateString){

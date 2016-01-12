@@ -1,13 +1,12 @@
 package mr.curk.piface;
 
+import mr.curk.mail.ConfigFile;
 import mr.curk.mail.SendMail;
 
-/**
- * Created by Mr.Curk@gmail.com on 7.1.2016.
- */
 public class HouseSecurityLogic implements PiLogicInterface {
     private PiFaceModule piFaceModule;
-    private boolean alarm = false;
+
+    private ConfigFile mailConfig;
 
     private State input_0;
     private State input_1;
@@ -38,6 +37,8 @@ public class HouseSecurityLogic implements PiLogicInterface {
         input_5 = piFaceModule.getStatusInput(5);
         input_6 = piFaceModule.getStatusInput(6);
         input_7 = piFaceModule.getStatusInput(7);
+
+        mailConfig = new ConfigFile("/home/pi/Malina/mail.config");
     }
 
     @Override
@@ -76,23 +77,22 @@ public class HouseSecurityLogic implements PiLogicInterface {
 
     private void logic() {
         if (input_0 == State.ON && input_3 == State.ON && !input_0_running) {
+
             input_0_running = true;
 
             new CountDown(20, 2);
 
             if (piFaceModule.getStatusInput(0) == State.ON){
+                piFaceModule.setCommand(PiCommand.OUTPUT_0_ON);
+                new Thread( new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
 
             }
-            SendMail.send("sensor 0", "sensor 0 at ");
 
-
-            piFaceModule.setCommand(PiCommand.OUTPUT_5_ON);
-            piFaceModule.setCommand(PiCommand.OUTPUT_6_ON);
-            piFaceModule.setCommand(PiCommand.OUTPUT_7_ON);
             input_0_running = false;
         }
 
         if (input_1 == State.ON) {
+            piFaceModule.setCommand(PiCommand.OUTPUT_0_OFF);
             piFaceModule.setCommand(PiCommand.OUTPUT_1_OFF);
             piFaceModule.setCommand(PiCommand.OUTPUT_2_OFF);
             piFaceModule.setCommand(PiCommand.OUTPUT_3_OFF);
