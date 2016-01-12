@@ -6,6 +6,9 @@ import mr.curk.mail.SendMail;
 public class HouseSecurityLogic implements PiLogicInterface {
     private PiFaceModule piFaceModule;
 
+    static private int numberButtonPressed = 0;
+    static private boolean alarmMode = true;
+    static private boolean alarmState = false;
     private ConfigFile mailConfig;
 
     private State input_0;
@@ -39,6 +42,12 @@ public class HouseSecurityLogic implements PiLogicInterface {
         input_7 = piFaceModule.getStatusInput(7);
 
         mailConfig = new ConfigFile("/home/pi/Malina/mail.config");
+
+        //new Thread(new SendMail(mailConfig, "HomeSecurety started", "HomeSecurety started")).start();
+    }
+
+    public static boolean isAlarmMode() {
+        return alarmMode;
     }
 
     @Override
@@ -74,32 +83,70 @@ public class HouseSecurityLogic implements PiLogicInterface {
         logic();
     }
 
-
     private void logic() {
-        if (input_0 == State.ON && input_3 == State.ON && !input_0_running) {
+        if (input_0 == State.ON && HouseSecurityLogic.alarmMode && !input_0_running && !HouseSecurityLogic.alarmState) {
 
             input_0_running = true;
 
             new CountDown(20, 2);
 
-            if (piFaceModule.getStatusInput(0) == State.ON){
-                piFaceModule.setCommand(PiCommand.OUTPUT_0_ON);
-                new Thread( new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
-
+            if (piFaceModule.getStatusInput(0) == State.ON && HouseSecurityLogic.alarmMode && !HouseSecurityLogic.alarmState) {
+                riseAlarm();
+                new Thread(new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
+            } else {
+                System.out.println("False alarm!");
             }
 
             input_0_running = false;
         }
 
         if (input_1 == State.ON) {
-            piFaceModule.setCommand(PiCommand.OUTPUT_0_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_1_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_2_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_3_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_4_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_5_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_6_OFF);
-            piFaceModule.setCommand(PiCommand.OUTPUT_7_OFF);
+            setButtonPressed();
+            new Thread(new ButtonPresedReset()).start();
+            if (HouseSecurityLogic.numberButtonPressed >= 3) {
+                resetAlarm();
+            }
         }
+    }
+
+    private void resetAlarm() {
+        if (HouseSecurityLogic.alarmMode) {
+            dismissAlarm();
+        }else {
+            System.out.println("Alarm set!");
+        }
+        HouseSecurityLogic.alarmState = false;
+
+        HouseSecurityLogic.alarmMode = !HouseSecurityLogic.alarmMode;
+    }
+
+    private void dismissAlarm() {
+
+        System.out.println("Alarm dismissed!");
+        piFaceModule.setCommand(PiCommand.OUTPUT_0_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_1_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_2_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_3_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_4_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_5_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_6_OFF);
+        piFaceModule.setCommand(PiCommand.OUTPUT_7_OFF);
+    }
+
+    private void riseAlarm() {
+        HouseSecurityLogic.alarmState = true;
+
+        piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
+        piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
+        piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);
+    }
+
+    public static void setButtonPressed() {
+        HouseSecurityLogic.numberButtonPressed++;
+        System.out.println("button pressed " + HouseSecurityLogic.numberButtonPressed);
+    }
+
+    public static void resetButtonPressed() {
+        HouseSecurityLogic.numberButtonPressed = 0;
     }
 }

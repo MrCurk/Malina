@@ -102,6 +102,7 @@ public class PiFaceModule {
             System.out.println("input " + i + " : " + getStatusInput(i)
                     + "\t output " + i + " : " + getStatusOutput(i));
         }
+        System.out.println("Alarm mode: " + HouseSecurityLogic.isAlarmMode());
     }
 
     //GET SPECIFIC INPUT STATUS

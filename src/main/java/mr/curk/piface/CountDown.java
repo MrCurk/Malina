@@ -21,6 +21,9 @@ public class CountDown {
 
         for (int i = 0; i < loopRepeat; i++) {
             System.out.println("Wait "+(loopRepeat-i));
+            if (!HouseSecurityLogic.isAlarmMode()){
+                break;
+            }
             try {
                 Thread.sleep(secondsInterval*1000);
             } catch (InterruptedException e) {

@@ -26,7 +26,6 @@ public class SendMail implements Runnable {
     @Override
     public void run() {
         try {
-
             Properties props = new Properties();
             props.put("mail.smtp.host", mailConfig.getMailSmtpHost()); // for gmail use smtp.gmail.com or "smtp.mail.yahoo.com"
             props.put("mail.smtp.auth", "true");
@@ -41,7 +40,6 @@ public class SendMail implements Runnable {
 
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(mailConfig.getUsername(), mailConfig.getPassword());
-
                 }
             });
 
@@ -56,15 +54,16 @@ public class SendMail implements Runnable {
             msg.setSubject(subject);
 
             //--[ Create the body of the mail
-            msg.setText(new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(Calendar.getInstance().getTime()) + message);
+            msg.setText(new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(Calendar.getInstance().getTime())
+                    + "    " + message);
 
             //--[ Ask the Transport class to send our mail message
             Transport.send(msg);
-
+            System.out.println("Mail sent!");
         } catch (Exception E) {
             System.out.println("SendMail Error!");
             System.out.println(E.toString());
         }
-        System.out.println("Mail sent!");
+
     }
 }

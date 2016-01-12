@@ -33,12 +33,23 @@ public class ConfigFile {
     public String getMailDebug() {
         return mailDebug;
     }
+
     public boolean getMailDebugBoolean() {
         return mailDebug.toUpperCase().equals("TRUE");
     }
 
     public String getMailSmtpHost() {
         return mailSmtpHost;
+    }
+
+    public void printSettings() {
+        System.out.println("Username " + username);
+        System.out.println("Password " + password);
+        System.out.println("MailFrom " + mailFrom);
+        System.out.println("MailTo " + mailTo);
+        System.out.println("MailSmtpHost " + mailSmtpHost);
+        System.out.println("MailDebug " + mailDebug);
+
     }
 
     // branje datoteke
@@ -61,7 +72,7 @@ public class ConfigFile {
     private void parseLine(String line) {
         String[] token = line.split(";");
 
-        switch (token[0].toUpperCase()) {
+        switch (token[0].toString().trim().toUpperCase()) {
             case "USERNAME":
                 username = token[1].trim();
                 break;
