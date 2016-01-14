@@ -3,7 +3,7 @@ package mr.curk.piface;
 import java.util.Scanner;
 
 public class PiConsole implements  Runnable {
-    private  PiFaceModule piFaceModule;
+    private final PiFaceModule piFaceModule;
 
     public PiConsole(PiFaceModule piFaceModule){
         this.piFaceModule = piFaceModule;

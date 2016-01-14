@@ -4,14 +4,12 @@ import com.pi4j.device.piface.PiFace;
 import com.pi4j.device.piface.impl.PiFaceDevice;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import mr.curk.common.State;
 
 import java.io.IOException;
 
 import static com.pi4j.wiringpi.Spi.CHANNEL_0;
 
-/**
- * Created by Mr.Curk@gmail.com on 29.12.2015.
- */
 public class PiFaceModule {
     final private PiFace piFace;
     private  HouseSecurityLogic houseSecurityLogic;
@@ -102,7 +100,7 @@ public class PiFaceModule {
             System.out.println("input " + i + " : " + getStatusInput(i)
                     + "\t output " + i + " : " + getStatusOutput(i));
         }
-        System.out.println("Alarm mode: " + HouseSecurityLogic.isAlarmMode());
+        System.out.println("Alarm mode: " + houseSecurityLogic.isAlarmEnabled());
     }
 
     //GET SPECIFIC INPUT STATUS
@@ -256,12 +254,12 @@ public class PiFaceModule {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent gpioPinDigitalStateChangeEvent) {
                 //OFF
                 if (gpioPinDigitalStateChangeEvent.getState().isHigh()) {
-                    System.out.println("Input 6 off");
+                    //System.out.println("Input 6 off");
                     houseSecurityLogic.setInput(6,State.OFF);
                 }
                 //ON
                 if (gpioPinDigitalStateChangeEvent.getState().isLow()) {
-                    System.out.println("Input 6 on");
+                    //System.out.println("Input 6 on");
                     houseSecurityLogic.setInput(6,State.ON);
                 }
             }

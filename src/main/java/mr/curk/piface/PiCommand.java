@@ -65,7 +65,7 @@ public enum PiCommand {
         System.out.println("op[0-7] on - turn output n on.");
         System.out.println("op[0-7] off - turn output n off.");
         System.out.println("status or s -  display status of inputs and outputs ");
-        System.out.println("reset -  reset PiFaceModul ");
+        System.out.println("reset -  reset PiFaceModule ");
         System.out.println("exit or quit or q - exit");
     }
 }

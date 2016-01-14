@@ -1,9 +1,9 @@
-package mr.curk.piface;
+package mr.curk.common;
 
 public enum State {
     ON, OFF;
 
     public boolean toBoolean(){
-       return  (this==State.ON ? true : false);
+       return  (this == State.ON);
     }
 }

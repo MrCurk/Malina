@@ -13,11 +13,11 @@ import java.util.Properties;
 
 
 public class SendMail implements Runnable {
-    private ConfigFile mailConfig;
-    private String subject;
-    private String message;
+    private final MailConfigFile mailConfig;
+    private final String subject;
+    private final String message;
 
-    public SendMail(ConfigFile mailConfig, String subject, String message) {
+    public SendMail(MailConfigFile mailConfig, String subject, String message) {
         this.mailConfig = mailConfig;
         this.subject = subject;
         this.message = message;

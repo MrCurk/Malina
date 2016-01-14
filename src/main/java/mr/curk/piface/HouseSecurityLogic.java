@@ -1,15 +1,17 @@
 package mr.curk.piface;
 
-import mr.curk.mail.ConfigFile;
+import mr.curk.common.*;
+import mr.curk.mail.MailConfigFile;
 import mr.curk.mail.SendMail;
 
-public class HouseSecurityLogic implements PiLogicInterface {
-    private PiFaceModule piFaceModule;
+public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition {
+    private final PiFaceModule piFaceModule;
 
-    static private int numberButtonPressed = 0;
-    static private boolean alarmMode = true;
-    static private boolean alarmState = false;
-    private ConfigFile mailConfig;
+    private int numberButtonPressed = 0;
+    private boolean alarmMode = true;
+    private boolean alarmState = false;
+
+    private MailConfigFile mailConfig;
 
     private State input_0;
     private State input_1;
@@ -19,16 +21,9 @@ public class HouseSecurityLogic implements PiLogicInterface {
     private State input_5;
     private State input_6;
     private State input_7;
-    private State output_0;
-    private State output_1;
-    private State output_2;
-    private State output_3;
-    private State output_4;
-    private State output_5;
-    private State output_6;
-    private State output_7;
 
-    private boolean input_0_running;
+    private boolean input_0_running = false;
+    private boolean input_6_running = false;
 
     public HouseSecurityLogic(PiFaceModule piFaceModule) {
         this.piFaceModule = piFaceModule;
@@ -41,17 +36,27 @@ public class HouseSecurityLogic implements PiLogicInterface {
         input_6 = piFaceModule.getStatusInput(6);
         input_7 = piFaceModule.getStatusInput(7);
 
-        mailConfig = new ConfigFile("/home/pi/Malina/mail.config");
+        //mail config, read from file
+        mailConfig = new MailConfigFile("/home/pi/Malina/mail.config");
 
-        //new Thread(new SendMail(mailConfig, "HomeSecurety started", "HomeSecurety started")).start();
+        //new Thread(new SendMail(mailConfig, "HomeSecurity started", "HomeSecurity started")).start();
     }
 
-    public static boolean isAlarmMode() {
+    //is alarm enabled
+    public boolean isAlarmEnabled() {
         return alarmMode;
     }
 
+    //is alarm fired
+    public boolean isAlarmFired() {
+        return alarmState;
+    }
+
+    //set inputs.....
     @Override
     public void setInput(int pin, State state) {
+        boolean correctInput = true;
+
         switch (pin) {
             case 0:
                 input_0 = state;
@@ -78,53 +83,70 @@ public class HouseSecurityLogic implements PiLogicInterface {
                 input_7 = state;
                 break;
             default:
-                break;
+                correctInput = false;
         }
-        logic();
+        if (correctInput) {
+            logic();
+        }
     }
 
     private void logic() {
 
-
-        if (input_0 == State.ON && HouseSecurityLogic.alarmMode && !input_0_running && !HouseSecurityLogic.alarmState) {
+        //main logic for rise alarm
+        if (input_0.toBoolean() && isAlarmEnabled() && !input_0_running && !isAlarmFired()) {
 
             input_0_running = true;
 
-            new CountDown(20, 2);
-
-            if (piFaceModule.getStatusInput(0) == State.ON && HouseSecurityLogic.alarmMode && !HouseSecurityLogic.alarmState) {
+            //wait 18 second, to eliminate sensor fault
+            new CountDown(this, 18, 2);
+            //if is still on, rise alarm
+            if (piFaceModule.getStatusInput(0) == State.ON && isAlarmEnabled() && !isAlarmFired()) {
                 riseAlarm();
+                //send mail
                 new Thread(new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
             } else {
                 System.out.println("False alarm!");
             }
-
             input_0_running = false;
         }
 
-        if (input_1 == State.ON) {
+        //reset button - enable, disable and dismiss alarm
+        if (input_6.toBoolean() && !input_6_running) {
+
+            input_6_running = true;
             setButtonPressed();
-            new Thread(new ButtonPresedReset()).start();
-            if (HouseSecurityLogic.numberButtonPressed >= 3) {
+
+            if (numberButtonPressed >= 3) {
                 resetAlarm();
             }
+            input_6_running = false;
         }
     }
 
+    //enable, disable and dismiss alarm
     private void resetAlarm() {
-        if (HouseSecurityLogic.alarmMode) {
-            dismissAlarm();
-        } else {
-            System.out.println("Alarm set!");
-        }
-        HouseSecurityLogic.alarmState = false;
 
-        HouseSecurityLogic.alarmMode = !HouseSecurityLogic.alarmMode;
+        if (isAlarmEnabled()) {
+            //dismiss alarm only if it is fired
+            if (isAlarmFired()) {
+                dismissAlarm();
+            }
+            //disable alarm
+            alarmMode = false;
+            numberButtonPressed = 0;
+        } else {
+            //set alarm after n seconds
+            System.out.println("Alarm will set in ");
+            new CountDown(40, 1);
+            alarmMode = true;
+            System.out.println("Alarm is set!");
+        }
+        alarmState = false;
     }
 
+    //dismiss alarm
     private void dismissAlarm() {
 
-        System.out.println("Alarm dismissed!");
         piFaceModule.setCommand(PiCommand.OUTPUT_0_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_1_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_2_OFF);
@@ -133,22 +155,39 @@ public class HouseSecurityLogic implements PiLogicInterface {
         piFaceModule.setCommand(PiCommand.OUTPUT_5_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_6_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_7_OFF);
+        System.out.println("Alarm dismissed!");
     }
 
+    //alarm rise
     private void riseAlarm() {
-        HouseSecurityLogic.alarmState = true;
-
+        alarmState = true;
+        //piFaceModule.setCommand(PiCommand.OUTPUT_0_ON);
         piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
         piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
         piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);
+        System.out.println("Alarm Alarm Alarm Alarm Alarm");
     }
 
-    public static void setButtonPressed() {
-        HouseSecurityLogic.numberButtonPressed++;
-        System.out.println("button pressed " + HouseSecurityLogic.numberButtonPressed);
+    //increase number of button pressed
+    private void setButtonPressed() {
+
+        if (numberButtonPressed == 0) {
+            new Thread(new ResetItAfterSeconds(this, 3)).start();
+        }
+        numberButtonPressed++;
+        System.out.println("button pressed " + numberButtonPressed);
     }
 
-    public static void resetButtonPressed() {
-        HouseSecurityLogic.numberButtonPressed = 0;
+
+    //interface method to reset button count pressed
+    @Override
+    public void resetIt() {
+        numberButtonPressed = 0;
+    }
+
+    //interface method for count down
+    @Override
+    public boolean isStillValid() {
+        return isAlarmEnabled();
     }
 }

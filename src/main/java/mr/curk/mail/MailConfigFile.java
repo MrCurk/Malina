@@ -2,7 +2,7 @@ package mr.curk.mail;
 
 import java.io.*;
 
-public class ConfigFile {
+public class MailConfigFile {
     private String mailTo = null;
     private String mailFrom = null;
     private String username = null;
@@ -10,7 +10,7 @@ public class ConfigFile {
     private String mailDebug = "false";
     private String mailSmtpHost = null;
 
-    public ConfigFile(String file) {
+    public MailConfigFile(String file) {
         parseFile(file);
     }
 
@@ -52,7 +52,7 @@ public class ConfigFile {
 
     }
 
-    // branje datoteke
+    // read config file
     private void parseFile(String fileName) {
         File file = new File(fileName);
         try {
@@ -68,11 +68,11 @@ public class ConfigFile {
         }
     }
 
-    // parsanje config file
+    // parse config file
     private void parseLine(String line) {
         String[] token = line.split(";");
 
-        switch (token[0].toString().trim().toUpperCase()) {
+        switch (token[0].trim().toUpperCase()) {
             case "USERNAME":
                 username = token[1].trim();
                 break;
