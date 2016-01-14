@@ -54,28 +54,28 @@ public class HouseSecurityLogic implements PiLogicInterface {
     public void setInput(int pin, State state) {
         switch (pin) {
             case 0:
-                input_0 = (state == State.ON ? State.ON : State.OFF);
+                input_0 = state;
                 break;
             case 1:
-                input_1 = (state == State.ON ? State.ON : State.OFF);
+                input_1 = state;
                 break;
             case 2:
-                input_2 = (state == State.ON ? State.ON : State.OFF);
+                input_2 = state;
                 break;
             case 3:
-                input_3 = (state == State.ON ? State.ON : State.OFF);
+                input_3 = state;
                 break;
             case 4:
-                input_4 = (state == State.ON ? State.ON : State.OFF);
+                input_4 = state;
                 break;
             case 5:
-                input_5 = (state == State.ON ? State.ON : State.OFF);
+                input_5 = state;
                 break;
             case 6:
-                input_6 = (state == State.ON ? State.ON : State.OFF);
+                input_6 = state;
                 break;
             case 7:
-                input_7 = (state == State.ON ? State.ON : State.OFF);
+                input_7 = state;
                 break;
             default:
                 break;
@@ -84,6 +84,8 @@ public class HouseSecurityLogic implements PiLogicInterface {
     }
 
     private void logic() {
+
+
         if (input_0 == State.ON && HouseSecurityLogic.alarmMode && !input_0_running && !HouseSecurityLogic.alarmState) {
 
             input_0_running = true;
@@ -112,7 +114,7 @@ public class HouseSecurityLogic implements PiLogicInterface {
     private void resetAlarm() {
         if (HouseSecurityLogic.alarmMode) {
             dismissAlarm();
-        }else {
+        } else {
             System.out.println("Alarm set!");
         }
         HouseSecurityLogic.alarmState = false;

@@ -1,8 +1,5 @@
 package mr.curk.piface;
 
-/**
- * Created by Mr.Curk@gmail.com on 5.1.2016.
- */
 public enum PiCommand {
     OUTPUT_0_ON, OUTPUT_0_OFF,
     OUTPUT_1_ON, OUTPUT_1_OFF,
