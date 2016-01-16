@@ -52,6 +52,23 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
         return alarmState;
     }
 
+    //enable alarm
+    public void enableAlarm() {
+        if (!isAlarmEnabled()) {
+            alarmMode = true;
+            System.out.println("Alarm is set!");
+        }
+    }
+
+    //disable alarm
+    public void disableAlarm() {
+        if (isAlarmEnabled()) {
+            dismissAlarm();
+            alarmMode = false;
+            alarmState = false;
+        }
+    }
+
     //set inputs.....
     @Override
     public void setInput(int pin, State state) {
@@ -138,8 +155,7 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
             //set alarm after n seconds
             System.out.println("Alarm will set in ");
             new CountDown(40, 1);
-            alarmMode = true;
-            System.out.println("Alarm is set!");
+            enableAlarm();
         }
         alarmState = false;
     }
@@ -190,4 +206,6 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
     public boolean isStillValid() {
         return isAlarmEnabled();
     }
+
+
 }

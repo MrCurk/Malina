@@ -82,6 +82,12 @@ public class PiFaceModule {
             case STATUS:
                 getStatusAll();
                 break;
+            case ENABLE:
+                houseSecurityLogic.enableAlarm();
+                break;
+            case DISABLE:
+                houseSecurityLogic.disableAlarm();
+                break;
             case EXIT:
                 removeAllListeners();
                 setAllOutputOff();
