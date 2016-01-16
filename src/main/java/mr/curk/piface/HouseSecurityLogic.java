@@ -2,7 +2,6 @@ package mr.curk.piface;
 
 import mr.curk.common.*;
 import mr.curk.mail.MailConfigFile;
-import mr.curk.mail.SendMail;
 
 public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition {
     private final PiFaceModule piFaceModule;
@@ -119,8 +118,6 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
             //if is still on, rise alarm
             if (piFaceModule.getStatusInput(0) == State.ON && isAlarmEnabled() && !isAlarmFired()) {
                 riseAlarm();
-                //send mail
-                new Thread(new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
             } else {
                 System.out.println("False alarm!");
             }
@@ -162,7 +159,7 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
 
     //dismiss alarm
     private void dismissAlarm() {
-
+        alarmState = false;
         piFaceModule.setCommand(PiCommand.OUTPUT_0_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_1_OFF);
         piFaceModule.setCommand(PiCommand.OUTPUT_2_OFF);
@@ -176,12 +173,19 @@ public class HouseSecurityLogic implements PiLogicInterface, ResetIt, Condition 
 
     //alarm rise
     private void riseAlarm() {
-        alarmState = true;
-        //piFaceModule.setCommand(PiCommand.OUTPUT_0_ON);
-        piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
-        piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
-        piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);
-        System.out.println("Alarm Alarm Alarm Alarm Alarm");
+        if (!isAlarmFired()) {
+            alarmState = true;
+            //send mail
+            //new Thread(new SendMail(mailConfig, "sensor 0", "sensor 0 message")).start();
+            //piFaceModule.setCommand(PiCommand.OUTPUT_0_ON);
+
+            piFaceModule.setCommand(PiCommand.OUTPUT_1_ON);
+            piFaceModule.setCommand(PiCommand.OUTPUT_2_ON);
+            piFaceModule.setCommand(PiCommand.OUTPUT_3_ON);
+            System.out.println("Alarm Alarm Alarm Alarm Alarm");
+            new CountDown(this,120,60);
+            dismissAlarm();
+        }
     }
 
     //increase number of button pressed
